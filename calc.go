@@ -15,24 +15,31 @@ func CalcAllOperation(qs []int, a int) string {
 	operations := make([][]int, 4)
 	operations = generateOperations(operations, len(qs)-1)
 
-	for _, operation := range operations {
-		res, ok := calcOperation(qs, operation)
-		if ok && res == a {
-			ops := bytes.NewBuffer(make([]byte, 0, 100))
-			for _, typ := range operation {
-				switch typ {
-				case ADD:
-					ops.WriteString("+")
-				case SUB:
-					ops.WriteString("-")
-				case MUL:
-					ops.WriteString("*")
-				case DIV:
-					ops.WriteString("/")
-				}
+	okOp := make(chan int)
+	for i := range operations {
+		go func(i int) {
+			res, ok := calcOperation(qs, operations[i])
+			if ok && res == a {
+				okOp <- i
+				return
 			}
-			return ops.String()
+		}(i)
+	}
+	if (<- okOp != -1) {
+		ops := bytes.NewBuffer(make([]byte, 0, 100))
+		for _, typ := range operations[<-okOp] {
+			switch typ {
+			case ADD:
+				ops.WriteString("+")
+			case SUB:
+				ops.WriteString("-")
+			case MUL:
+				ops.WriteString("*")
+			case DIV:
+				ops.WriteString("/")
+			}
 		}
+		return ops.String()
 	}
 	panic("What???")
 }
