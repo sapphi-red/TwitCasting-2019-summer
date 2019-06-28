@@ -39,8 +39,7 @@ func Get(level string) *getStruct {
 	}
 
 	var struc getStruct
-	body, _ := ioutil.ReadAll(res.Body)
-	if err := json.Unmarshal(body, &struc); err != nil {
+	if err := json.NewDecoder(res.Body).Decode(&struc); err != nil {
 		panic(err)
 	}
 
