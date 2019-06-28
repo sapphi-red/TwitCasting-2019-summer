@@ -15,12 +15,13 @@ func CalcAllOperation(qs []int, a int) string {
 	operations := make([][]int, 4)
 	operations = generateOperations(operations, len(qs)-1)
 
-	okOp := make(chan int, 1)
+	okOp := make(chan int)
 	for i := range operations {
 		go func(i int) {
 			res, ok := calcOperation(qs, operations[i])
 			if ok && res == a {
 				okOp <- i
+				return
 			}
 		}(i)
 	}
