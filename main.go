@@ -1,10 +1,10 @@
 package main
 
 import (
-	"strings"
-	"strconv"
 	"bytes"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -30,7 +30,7 @@ func main() {
 
 	ans := calcAllOperation(q4, a)
 
-	fmt.Println("Ans: "+ans)
+	fmt.Println("Ans: " + ans)
 
 	Post(st.ID, ans)
 }
@@ -45,10 +45,14 @@ func calcAllOperation(qs []int, a int) string {
 			ops := bytes.NewBuffer(make([]byte, 0, 100))
 			for _, typ := range operation {
 				switch typ {
-				case ADD: ops.WriteString("+")
-				case SUB: ops.WriteString("-")
-				case MUL: ops.WriteString("*")
-				case DIV: ops.WriteString("/")
+				case ADD:
+					ops.WriteString("+")
+				case SUB:
+					ops.WriteString("-")
+				case MUL:
+					ops.WriteString("*")
+				case DIV:
+					ops.WriteString("/")
 				}
 			}
 			return ops.String()
@@ -71,7 +75,7 @@ func generateOperations(ops [][]int, remainLen int) [][]int {
 			newOps[i*4+j] = op
 		}
 	}
-	return generateOperations(newOps, remainLen - 1)
+	return generateOperations(newOps, remainLen-1)
 }
 
 func calcOperation(qs []int, op []int) (int, bool) {
@@ -107,11 +111,14 @@ func calcOperation(qs []int, op []int) (int, bool) {
 
 func calcOne(n, m, typ int) (int, bool) {
 	switch typ {
-	case ADD: return n + m, true
-	case SUB: return n - m, true
-	case MUL: return n * m, true
+	case ADD:
+		return n + m, true
+	case SUB:
+		return n - m, true
+	case MUL:
+		return n * m, true
 	case DIV:
-		if (n % m == 0) {
+		if n%m == 0 {
 			return n / m, true
 		}
 		return 0, false

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
-	"encoding/json"
-	"io/ioutil"
-	"fmt"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -13,8 +13,8 @@ import (
 var TOKEN string
 
 type getStruct struct {
-	ID	string	`json:"id"`
-	Question	string	`json:"question"`
+	ID       string `json:"id"`
+	Question string `json:"question"`
 }
 
 func Init() {
@@ -44,7 +44,7 @@ func Get(level string) *getStruct {
 		panic(err)
 	}
 
-	fmt.Println("GET: "+struc.ID + " ||| " + struc.Question)
+	fmt.Println("GET: " + struc.ID + " ||| " + struc.Question)
 
 	res.Body.Close()
 	return &struc
@@ -61,6 +61,6 @@ func Post(id string, answer string) {
 	}
 
 	body, _ := ioutil.ReadAll(res.Body)
-	fmt.Println("POST: "+string(body))
+	fmt.Println("POST: " + string(body))
 	res.Body.Close()
 }
