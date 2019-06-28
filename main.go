@@ -7,6 +7,13 @@ import (
 	"fmt"
 )
 
+const (
+	ADD = 0
+	SUB = 1
+	MUL = 2
+	DIV = 3
+)
+
 func main() {
 	Init()
 
@@ -38,10 +45,10 @@ func calcAllOperation(qs []int, a int) string {
 			ops := bytes.NewBuffer(make([]byte, 0, 100))
 			for _, typ := range operation {
 				switch typ {
-				case 0: ops.WriteString("+")
-				case 1: ops.WriteString("-")
-				case 2: ops.WriteString("*")
-				case 3: ops.WriteString("/")
+				case ADD: ops.WriteString("+")
+				case SUB: ops.WriteString("-")
+				case MUL: ops.WriteString("*")
+				case DIV: ops.WriteString("/")
 				}
 			}
 			return ops.String()
@@ -68,11 +75,11 @@ func generateOperations(ops [][]int, remainLen int) [][]int {
 }
 
 func calcOperation(qs []int, op []int) (int, bool) {
-	if (len(op) <= 0) {
+	if len(op) <= 0 {
 		return qs[0], true
 	}
 
-	if (len(op) == 1 || op[1] < 2) {
+	if len(op) == 1 || op[1] == ADD || op[1] == SUB {
 		newQ, ok := calcOne(qs[0], qs[1], op[0])
 		if !ok {
 			return 0, false
@@ -82,6 +89,7 @@ func calcOperation(qs []int, op []int) (int, bool) {
 		res = append(res, qs[2:]...)
 		return calcOperation(res, op[1:])
 	}
+
 	newQ, ok := calcOne(qs[1], qs[2], op[1])
 	if !ok {
 		return 0, false
@@ -99,10 +107,10 @@ func calcOperation(qs []int, op []int) (int, bool) {
 
 func calcOne(n, m, typ int) (int, bool) {
 	switch typ {
-	case 0: return n + m, true
-	case 1: return n - m, true
-	case 2: return n * m, true
-	case 3:
+	case ADD: return n + m, true
+	case SUB: return n - m, true
+	case MUL: return n * m, true
+	case DIV:
 		if (n % m == 0) {
 			return n / m, true
 		}
