@@ -11,66 +11,63 @@ const (
 	DIV = 3
 )
 
-func CalcAllOperation(qs []int, a int) string {
-	operations := make([][]int, 4)
-	operations = generateOperations(operations, len(qs)-1)
+// operationは4進数 下の桁から上の桁に
 
-	for _, operation := range operations {
-		res, ok := calcOperation(qs, operation)
+// iは0～
+func getOperation(ops uint, i uint) uint {
+	ops = ops >> (i * 2)
+	ops = ops & 3 /* 0b11 */
+	return ops
+}
+
+func operationToString(op uint, len uint) string {
+	operation := bytes.NewBuffer(make([]byte, 0, len))
+	for i := uint(0); i < len; i++ {
+		switch getOperation(op, i) {
+			case ADD:
+				operation.WriteString("+")
+			case SUB:
+				operation.WriteString("-")
+			case MUL:
+				operation.WriteString("*")
+			case DIV:
+				operation.WriteString("/")
+		}
+	}
+	return operation.String()
+}
+
+func CalcAllOperation(qs []int, a int) string {
+	len := uint( len(qs)-1 )
+	maxOps := uint( 1 << (len * 2) )
+
+	for op := uint(0); op < maxOps; op++ {
+		res, ok := calcOperation(qs, op)
 		if ok && res == a {
-			ops := bytes.NewBuffer(make([]byte, 0, 100))
-			for _, typ := range operation {
-				switch typ {
-				case ADD:
-					ops.WriteString("+")
-				case SUB:
-					ops.WriteString("-")
-				case MUL:
-					ops.WriteString("*")
-				case DIV:
-					ops.WriteString("/")
-				}
-			}
-			return ops.String()
+			return operationToString(op, len)
 		}
 	}
 	panic("What???")
 }
 
-func generateOperations(ops [][]int, remainLen int) [][]int {
-	if remainLen <= 0 {
-		return ops
-	}
-
-	newOps := make([][]int, len(ops)*4)
-	for i, a := range ops {
-		for j := 0; j < 4; j++ {
-			op := make([]int, 0, len(a)+1)
-			op = append(op, a...)
-			op = append(op, j)
-			newOps[i*4+j] = op
-		}
-	}
-	return generateOperations(newOps, remainLen-1)
-}
-
-func calcOperation(qs []int, op []int) (int, bool) {
-	if len(op) <= 0 {
-		return qs[0], true
-	}
-
-	if len(op) == 1 || op[1] == ADD || op[1] == SUB {
-		newQ, ok := calcOne(qs[0], qs[1], op[0])
+func calcOperation(qs []int, op uint) (int, bool) {
+	op1 := getOperation(op, 1)
+	if len(qs) <= 2 || op1 == ADD || op1 == SUB {
+		newQ, ok := calcOne(qs[0], qs[1], getOperation(op, 0))
 		if !ok {
 			return 0, false
+		}
+		if (len(qs) <= 2) {
+			return newQ, true
 		}
 		res := make([]int, 0, len(qs)-1)
 		res = append(res, newQ)
 		res = append(res, qs[2:]...)
-		return calcOperation(res, op[1:])
+		op = op >> (1 * 2)
+		return calcOperation(res, op)
 	}
 
-	newQ, ok := calcOne(qs[1], qs[2], op[1])
+	newQ, ok := calcOne(qs[1], qs[2], op1)
 	if !ok {
 		return 0, false
 	}
@@ -79,13 +76,13 @@ func calcOperation(qs []int, op []int) (int, bool) {
 	res = append(res, newQ)
 	res = append(res, qs[3:]...)
 
-	oN := make([]int, 0, len(op)-1)
-	oN = append(oN, op[0])
-	oN = append(oN, op[2:]...)
-	return calcOperation(res, oN)
+	o0 := getOperation(op, 0)
+	op = op >> (2 * 2) << (1 * 2)
+	op += o0
+	return calcOperation(res, op)
 }
 
-func calcOne(n, m, typ int) (int, bool) {
+func calcOne(n, m int, typ uint) (int, bool) {
 	switch typ {
 	case ADD:
 		return n + m, true
@@ -94,7 +91,7 @@ func calcOne(n, m, typ int) (int, bool) {
 	case MUL:
 		return n * m, true
 	case DIV:
-		if n%m == 0 {
+		if n % m == 0 {
 			return n / m, true
 		}
 		return 0, false
