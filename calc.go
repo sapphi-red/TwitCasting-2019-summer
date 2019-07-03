@@ -24,22 +24,22 @@ func operationToString(op uint, len uint) string {
 	operation := bytes.NewBuffer(make([]byte, 0, len))
 	for i := uint(0); i < len; i++ {
 		switch getOperation(op, i) {
-			case ADD:
-				operation.WriteString("+")
-			case SUB:
-				operation.WriteString("-")
-			case MUL:
-				operation.WriteString("*")
-			case DIV:
-				operation.WriteString("/")
+		case ADD:
+			operation.WriteString("+")
+		case SUB:
+			operation.WriteString("-")
+		case MUL:
+			operation.WriteString("*")
+		case DIV:
+			operation.WriteString("/")
 		}
 	}
 	return operation.String()
 }
 
 func CalcAllOperation(qs []int, a int) string {
-	qsLen := uint( len(qs)-1 )
-	maxOps := uint( 1 << (qsLen * 2) )
+	qsLen := uint(len(qs) - 1)
+	maxOps := uint(1 << (qsLen * 2))
 
 	for op := uint(0); op < maxOps; op++ {
 		// calcOperationは破壊的なのでコピー
@@ -96,7 +96,7 @@ func calcOne(n, m int, typ uint) (int, bool) {
 	case MUL:
 		return n * m, true
 	case DIV:
-		if n % m == 0 {
+		if n%m == 0 {
 			return n / m, true
 		}
 		return 0, false
