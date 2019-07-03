@@ -38,13 +38,17 @@ func operationToString(op uint, len uint) string {
 }
 
 func CalcAllOperation(qs []int, a int) string {
-	len := uint( len(qs)-1 )
-	maxOps := uint( 1 << (len * 2) )
+	qsLen := uint( len(qs)-1 )
+	maxOps := uint( 1 << (qsLen * 2) )
 
 	for op := uint(0); op < maxOps; op++ {
-		res, ok := calcOperation(qs, op)
+		// calcOperationは破壊的なのでコピー
+		qs2 := make([]int, len(qs))
+		copy(qs2, qs)
+
+		res, ok := calcOperation(qs2, op)
 		if ok && res == a {
-			return operationToString(op, len)
+			return operationToString(op, qsLen)
 		}
 	}
 	panic("What???")
@@ -57,29 +61,29 @@ func calcOperation(qs []int, op uint) (int, bool) {
 		if !ok {
 			return 0, false
 		}
-		if (len(qs) <= 2) {
+		if len(qs) <= 2 {
 			return newQ, true
 		}
-		res := make([]int, 0, len(qs)-1)
-		res = append(res, newQ)
-		res = append(res, qs[2:]...)
+
+		qs[1] = newQ
+		qs = qs[1:]
+
 		op = op >> (1 * 2)
-		return calcOperation(res, op)
+		return calcOperation(qs, op)
 	}
 
 	newQ, ok := calcOne(qs[1], qs[2], op1)
 	if !ok {
 		return 0, false
 	}
-	res := make([]int, 0, len(qs)-1)
-	res = append(res, qs[0])
-	res = append(res, newQ)
-	res = append(res, qs[3:]...)
+
+	qs = append(qs[0:2], qs[3:]...)
+	qs[1] = newQ
 
 	o0 := getOperation(op, 0)
 	op = op >> (2 * 2) << (1 * 2)
 	op += o0
-	return calcOperation(res, op)
+	return calcOperation(qs, op)
 }
 
 func calcOne(n, m int, typ uint) (int, bool) {
