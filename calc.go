@@ -42,11 +42,7 @@ func CalcAllOperation(qs []int, a int) string {
 	maxOps := uint(1 << (qsLen * 2))
 
 	for op := uint(0); op < maxOps; op++ {
-		// calcOperationは破壊的なのでコピー
-		qs2 := make([]int, len(qs))
-		copy(qs2, qs)
-
-		res, ok := calcOperation(qs2, op)
+		res, ok := calcOperation(qs, op)
 		if ok && res == a {
 			return operationToString(op, qsLen)
 		}
@@ -54,7 +50,11 @@ func CalcAllOperation(qs []int, a int) string {
 	panic("What???")
 }
 
-func calcOperation(qs []int, op uint) (int, bool) {
+func calcOperation(qsOriginal []int, op uint) (int, bool) {
+	// 以下破壊的なのでコピー
+	qs := make([]int, len(qsOriginal))
+	copy(qs, qsOriginal)
+
 	for {
 		op1 := getOperation(op, 1)
 		if len(qs) <= 2 || op1 == ADD || op1 == SUB {
