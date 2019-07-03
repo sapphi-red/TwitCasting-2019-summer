@@ -55,35 +55,36 @@ func CalcAllOperation(qs []int, a int) string {
 }
 
 func calcOperation(qs []int, op uint) (int, bool) {
-	op1 := getOperation(op, 1)
-	if len(qs) <= 2 || op1 == ADD || op1 == SUB {
-		newQ, ok := calcOne(qs[0], qs[1], getOperation(op, 0))
+	for {
+		op1 := getOperation(op, 1)
+		if len(qs) <= 2 || op1 == ADD || op1 == SUB {
+			newQ, ok := calcOne(qs[0], qs[1], getOperation(op, 0))
+			if !ok {
+				return 0, false
+			}
+			if len(qs) <= 2 {
+				return newQ, true
+			}
+
+			qs[1] = newQ
+			qs = qs[1:]
+
+			op = op >> (1 * 2)
+			continue
+		}
+
+		newQ, ok := calcOne(qs[1], qs[2], op1)
 		if !ok {
 			return 0, false
 		}
-		if len(qs) <= 2 {
-			return newQ, true
-		}
 
+		qs = append(qs[0:2], qs[3:]...)
 		qs[1] = newQ
-		qs = qs[1:]
 
-		op = op >> (1 * 2)
-		return calcOperation(qs, op)
+		o0 := getOperation(op, 0)
+		op = op >> (2 * 2) << (1 * 2)
+		op += o0
 	}
-
-	newQ, ok := calcOne(qs[1], qs[2], op1)
-	if !ok {
-		return 0, false
-	}
-
-	qs = append(qs[0:2], qs[3:]...)
-	qs[1] = newQ
-
-	o0 := getOperation(op, 0)
-	op = op >> (2 * 2) << (1 * 2)
-	op += o0
-	return calcOperation(qs, op)
 }
 
 func calcOne(n, m int, typ uint) (int, bool) {
